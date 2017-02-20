@@ -20,7 +20,8 @@ import java.io.*;
 public class Main {
 	
 	public static Map<String, ArrayList<String>> AdjacencyList;
-	
+	public static Set<String> explored = new HashSet<String>();
+	public static Node parent = null;
 	public static void main(String[] args) throws Exception {
 		
 		Scanner kb;	// input Scanner for commands
@@ -41,7 +42,7 @@ public class Main {
 		if(!input.contains("/quit")){
 			String start = input.get(0);
 			String end = input.get(1);
-			ArrayList<String> ladder = getWordLadderBFS(start, end);
+			ArrayList<String> ladder = getWordLadderDFS(start, end);
 			printLadder(ladder);
 		}
 		
@@ -61,6 +62,7 @@ public class Main {
 	
 	public static void initialize() { //create adjacency list once for dictionary provided
 		AdjacencyList = CreateAdjacencyList(makeDictionary());
+
 	}
 	
 	/**
@@ -83,8 +85,41 @@ public class Main {
 		
 		// Returned list should be ordered start to end.  Include start and end.
 		// Return empty list if no ladder.
+		
+		Node begin = new Node(start, parent);	//starting position
+		explored.add(begin.word);	//adding to explored list set
+		
+		if(begin.word.equals(end)){	//found end value
+			ArrayList<String> dfsLadder = new ArrayList<String>();
+			dfsLadder.add(end);
+			begin = begin.parent;
+			while(begin != null){
+				dfsLadder.add(begin.word);
+				begin = begin.parent;
+			}
+			return dfsLadder;
+			
+		}else{
+			ArrayList<String> dfsNeighbors = AdjacencyList.get(begin.word);
+			for(String j : dfsNeighbors){
+				if(!explored.contains(j)){
+					parent = begin;
+					return getWordLadderDFS(j, end);
+					
+				}
+				
+			}
+			ArrayList<String> dfsLadder = new ArrayList<String>();
+			dfsLadder.add(start);
+			dfsLadder.add(end);
+			return dfsLadder;
+			
+		}
+		
+		
+		
 		// TODO some code
-		Set<String> dict = makeDictionary();
+		/*Set<String> dict = makeDictionary();
 		Set<String> explored = new HashSet<String>();
 		Queue<Node> dfsq = new LinkedList<Node>();
 		Node begin = new Node(start, null);
@@ -117,9 +152,12 @@ public class Main {
 		
 		
 		// TODO more code
+		ArrayList<String> dfsladder = new ArrayList<String>();
+		dfsladder.add(start);
+		dfsladder.add(end);
+		return dfsladder;*/
 		
-		
-		return null; // replace this line later with real return
+		//return null; // replace this line later with real return
 	}
 	
     public static ArrayList<String> getWordLadderBFS(String start, String end) {
@@ -160,7 +198,9 @@ public class Main {
 		Set<String> words = new HashSet<String>();
 		Scanner infile = null;
 		try {
+			//infile = new Scanner (new File("five_letter_words.txt"));
 			infile = new Scanner (new File("five_letter_words.txt"));
+
 		} catch (FileNotFoundException e) {
 			System.out.println("Dictionary File not Found!");
 			e.printStackTrace();
