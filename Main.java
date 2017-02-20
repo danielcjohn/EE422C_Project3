@@ -85,6 +85,37 @@ public class Main {
 		// Return empty list if no ladder.
 		// TODO some code
 		Set<String> dict = makeDictionary();
+		Set<String> explored = new HashSet<String>();
+		Queue<Node> dfsq = new LinkedList<Node>();
+		Node begin = new Node(start, null);
+		dfsq.add(begin);
+		
+		while(!dfsq.isEmpty()){
+			Node currentdfs = dfsq.remove();
+			if(currentdfs.word.equals(end)){
+				ArrayList<String> dfsladder = new ArrayList<String>();
+				dfsladder.add(currentdfs.word);
+				currentdfs = currentdfs.parent;
+				while(currentdfs != null){
+					dfsladder.add(currentdfs.word);
+					currentdfs = currentdfs.parent;
+				}
+				return dfsladder;
+			}
+			//explored.add??
+			ArrayList<String> dfsNeighbors = AdjacencyList.get(currentdfs.word);
+			for(String s : dfsNeighbors){
+				if(!explored.contains(s)){
+					
+					getWordLadderDFS(s, end); // is this right?
+					explored.add(s); //check
+					
+				}
+				
+			}
+		}
+		
+		
 		// TODO more code
 		
 		
