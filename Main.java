@@ -20,6 +20,9 @@ import java.io.*;
 public class Main {
 	
 	public static Map<String, ArrayList<String>> AdjacencyList;
+	public static Set<String> explored = new HashSet<String>();
+	public static Node parent = null;
+	
 	
 	public static void main(String[] args) throws Exception {
 		
@@ -41,23 +44,11 @@ public class Main {
 		while(!input.contains("/quit")){ //if /quit is one of two words entered, terminate program
 			String start = input.get(0);
 			String end = input.get(1);
-			ArrayList<String> ladder = getWordLadderBFS(start, end);
+			ArrayList<String> ladder = getWordLadderDFS(start, end);
 			printLadder(ladder);
 			input = parse(kb);
 		}
-		
-		/*for testing in linux only
-		  ArrayList<String> ladder = getWordLadderBFS("STONE", "MONEY");
-		  printLadder(ladder);
-		  ladder = getWordLadderBFS("ALDOL", "DRAWL");
-		  printLadder(ladder);
-		  ladder = getWordLadderBFS("SMART", "MONEY");
-		  printLadder(ladder);
-		  ladder = getWordLadderBFS("HELLO", "CELLS");
-		  printLadder(ladder);*/
-		 
-		
-		// TODO methods to read in words, output ladder
+
 	}
 	
 	public static void initialize() { 
@@ -80,17 +71,62 @@ public class Main {
 	}
 	
 	public static ArrayList<String> getWordLadderDFS(String start, String end) {
-		
-		// Returned list should be ordered start to end.  Include start and end.
-		//TODO some code
-	
-		return null; // replace this line later with real return
+		start = start.toUpperCase();
+    	end = end.toUpperCase();
+		Node first = new Node(start, null);	//starting position
+		Set<String> visited = new HashSet<String>();
+		Node found = findDFS(first, end, visited);
+		if(!(found==null)){
+			ArrayList<String> dfsLadder = new ArrayList<String>();
+			dfsLadder.add(end);
+			found = found.parent;
+			while(found != null){
+				dfsLadder.add(found.word);
+				found = found.parent;
+			}
+			return dfsLadder;
+			}
+		else{
+			ArrayList<String> ladder = new ArrayList<String>();
+			ladder.add(start);
+			ladder.add(end);
+			return ladder;
+		}
 	}
-	
+		
+	public static Node findDFS(Node n, String end, Set<String> visited){
+		if(n==null){
+			return null;
+		}
+		visited.add(n.word);
+		if(n.word.equals(end)){
+			return n;
+		}else{
+			ArrayList<String> dfsNeighbors = AdjacencyList.get(n.word);
+			for(String j : dfsNeighbors){
+				if(!visited.contains(j)){
+					Node current = new Node(j, n);
+					Node found = findDFS(current, end, visited);
+					if(!(found==null)){
+						return found;
+					}
+					}
+				}
+			return null;
+			}
+		}
+		
 	
     public static ArrayList<String> getWordLadderBFS(String start, String end) {
     	start = start.toUpperCase();
     	end = end.toUpperCase();
+    	if(start.equals(end)){
+    		//if start and end word are same, return list with both words and print "no ladder found"
+    		ArrayList<String> ladder = new ArrayList<String>();
+    		ladder.add(start);
+    		ladder.add(end);
+    		return ladder;
+    	}
     	Set<String> visited = new HashSet<String>(); //keep track of visited words
 		Queue<Node> qe = new LinkedList<Node>(); 
 		Node first = new Node(start, null);
