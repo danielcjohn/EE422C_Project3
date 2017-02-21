@@ -38,29 +38,30 @@ public class Main {
 		
 		
 		ArrayList<String> input = parse(kb);
-		if(!input.contains("/quit")){
+		while(!input.contains("/quit")){ //if /quit is one of two words entered, terminate program
 			String start = input.get(0);
 			String end = input.get(1);
 			ArrayList<String> ladder = getWordLadderBFS(start, end);
 			printLadder(ladder);
+			input = parse(kb);
 		}
 		
 		/*for testing in linux only
-		  *ArrayList<String> ladder = getWordLadderBFS("stone", "money");
-		  *printLadder(ladder);
-		  *ladder = getWordLadderBFS("aldol", "drawl");
-		  *printLadder(ladder);
-		  *ladder = getWordLadderBFS("smart", "money");
-		  *printLadder(ladder);
-		  *ladder = getWordLadderBFS("hello", "cells");
-		  *printLadder(ladder);
-		 */
+		  ArrayList<String> ladder = getWordLadderBFS("STONE", "MONEY");
+		  printLadder(ladder);
+		  ladder = getWordLadderBFS("ALDOL", "DRAWL");
+		  printLadder(ladder);
+		  ladder = getWordLadderBFS("SMART", "MONEY");
+		  printLadder(ladder);
+		  ladder = getWordLadderBFS("HELLO", "CELLS");
+		  printLadder(ladder);*/
+		 
 		
 		// TODO methods to read in words, output ladder
 	}
 	
-	public static void initialize() { //create adjacency list once for dictionary provided
-		AdjacencyList = CreateAdjacencyList(makeDictionary());
+	public static void initialize() { 
+		AdjacencyList = CreateAdjacencyList(makeDictionary()); //create adjacency list once for dictionary provided
 	}
 	
 	/**
@@ -71,35 +72,32 @@ public class Main {
 	public static ArrayList<String> parse(Scanner keyboard) {
 	ArrayList<String> in = new ArrayList<String>();
 	in.add(keyboard.next());
-	if(in.contains("/quit")){
+	if(in.contains("/quit")){ //if /quit is first word entered, terminate program
 		return in;
 	}
 	in.add(keyboard.next());
 	return in;
-
 	}
 	
 	public static ArrayList<String> getWordLadderDFS(String start, String end) {
 		
 		// Returned list should be ordered start to end.  Include start and end.
-		// Return empty list if no ladder.
-		// TODO some code
-		Set<String> dict = makeDictionary();
-		// TODO more code
-		
-		
+		//TODO some code
+	
 		return null; // replace this line later with real return
 	}
 	
+	
     public static ArrayList<String> getWordLadderBFS(String start, String end) {
-    	Set<String> visited = new HashSet<String>();
-		Queue<Node> qe = new LinkedList<Node>();
+    	start = start.toUpperCase();
+    	end = end.toUpperCase();
+    	Set<String> visited = new HashSet<String>(); //keep track of visited words
+		Queue<Node> qe = new LinkedList<Node>(); 
 		Node first = new Node(start, null);
-		qe.add(first);
+		qe.add(first); 								//add starting node to queue
 		while(!qe.isEmpty()){
 			Node current = qe.remove();
-			if(current.word.equals(end)){
-				//create ArrayList and return;
+			if(current.word.equals(end)){ 			//if end word found, create word ladder and return;
 				ArrayList<String> ladder = new ArrayList<String>();
 				ladder.add(current.word);
 				current = current.parent;
@@ -109,16 +107,17 @@ public class Main {
 				}
 				return ladder;
 			}
-			ArrayList<String> neighbors = AdjacencyList.get(current.word);
-			for(String n : neighbors){
-				if(!visited.contains(n)){
-					visited.add(n);
-					Node next = new Node(n, current);
-					qe.add(next);
+			ArrayList<String> neighbors = AdjacencyList.get(current.word);	
+			for(String n : neighbors){										//for each neighbor of current head
+				if(!visited.contains(n)){										//if neighbor has not been visited
+					visited.add(n);													//mark neighbor as visited
+					Node next = new Node(n, current);								//mark neighbors parent to be head
+					qe.add(next);													//add neighbor to queue
 				}
 			}
 		}
 		
+		//if no word ladder is found, return list with only start and end word
 		ArrayList<String> ladder = new ArrayList<String>();
 		ladder.add(start);
 		ladder.add(end);
@@ -136,18 +135,18 @@ public class Main {
 			System.exit(1);
 		}
 		while (infile.hasNext()) {
-			words.add(infile.next()/*.toUpperCase()*/); //fix to work for upper case 
+			words.add(infile.next().toUpperCase());
 		}
 		return words;
 	}
 	
 	public static void printLadder(ArrayList<String> ladder) {
 		if(ladder.size() == 2){ //if no ladder found, the ladder array will only contain the start and end word
-			System.out.println("no word ladder can be found between " + ladder.get(0) + " and " + ladder.get(1) + ".");
+			System.out.println("no word ladder can be found between " + ladder.get(0).toLowerCase() + " and " + ladder.get(1).toLowerCase() + ".");
 		}else{
-			System.out.println("a " + (ladder.size()-2) + "-rung word ladder exists between " + ladder.get(ladder.size()-1) + " and " + ladder.get(0) + ".");
+			System.out.println("a " + (ladder.size()-2) + "-rung word ladder exists between " + ladder.get(ladder.size()-1).toLowerCase() + " and " + ladder.get(0).toLowerCase() + ".");
 			for(int i = ladder.size()-1; i>=0; i--){
-				System.out.println(ladder.get(i));
+				System.out.println(ladder.get(i).toLowerCase());
 			}
 		}
 	
@@ -159,7 +158,7 @@ public class Main {
 	
 	/*creates adjacency list for each word in given dictionary
 	* Each key to the Map is a word from the dictionary and each
-	* 	Map value is list of words that differ by one letter
+	* 	Map value is list of words that differ from key by one letter
 	*/
 	public static Map<String, ArrayList<String>> CreateAdjacencyList(Set<String> dict){
 	Map<String, ArrayList<String>> AList = new HashMap<>();
@@ -178,6 +177,7 @@ public class Main {
 		}
 	return AList;
 }
+	
 	/* returns true of the two strings differ by one letter
 	 * used to create the adjacency list
 	 */
